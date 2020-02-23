@@ -4,6 +4,9 @@ target/
 !**/src/main/**
 !**/src/test/**
 
+#上传war包
+!*.war
+
 ### STS ###
 .apt_generated
 .classpath

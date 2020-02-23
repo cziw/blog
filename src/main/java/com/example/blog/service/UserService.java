@@ -9,15 +9,43 @@ import java.util.List;
 
 public interface UserService {
     /**
-     * 获取所有用户列表
+     * 用户首页注册
+     *
+     * @param user
      * @return
      */
-    List<User> getUserList();
+    int userRegister(User user);
 
     /**
-     * 获取第一个用户的名字
+     * 查询用户账号是否重复
+     *
+     * @param user_name
      * @return
      */
-    User getOneName();
+    List<User> queryUserName(String user_name);
 
+    /**
+     * 查询用户邮箱是否重复
+     *
+     * @param user_email
+     * @return
+     */
+    List<User> queryUserEmail(String user_email);
+
+
+    /**
+     * 查询用户昵称是否重复
+     *
+     * @param user_telephone_number
+     * @return
+     */
+    List<User> queryUserTel(String user_telephone_number);
+
+    /**
+     * 用户登录
+     *
+     * @param user
+     * @return
+     */
+    User userLogin(User user);
 }

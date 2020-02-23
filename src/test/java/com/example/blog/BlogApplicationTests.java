@@ -11,7 +11,7 @@ class BlogApplicationTests {
     private UserService userSerivce;
     @Test
     void contextLoads() {
-        System.out.println(userSerivce.getUserList());
+
     }
 
 
