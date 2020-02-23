@@ -37,7 +37,7 @@ public interface UserMapper {
     List<User> queryUserEmail(String user_email);
 
     /**
-     * 查询用户昵称是否重复
+     * 查询用户手机号是否重复
      *
      * @param user_telephone_number
      * @return
