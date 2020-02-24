@@ -54,9 +54,9 @@ public class UserController {
     @RequestMapping("queryUserName")
     public ResponseEntity<?> queryUserName(@RequestParam(name = "user_name") String user_name) {
         if (userService.queryUserName(user_name).size() == 0) {
-            return new ResponseEntity<>("昵称可用",HttpStatus.OK);
+            return new ResponseEntity<>("昵称可用", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("昵称已被使用",HttpStatus.FOUND);
+            return new ResponseEntity<>("昵称已被使用", HttpStatus.FOUND);
         }
     }
 
@@ -107,6 +107,105 @@ public class UserController {
             return new ResponseEntity<>(cr, HttpStatus.OK);
         } else {
             return new ResponseEntity<>("账号密码错误", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * 头像上传base64
+     *
+     * @param user_profile_photo
+     * @return
+     */
+    @RequestMapping("photoUpload")
+    public ResponseEntity<?> photoUpload(@RequestParam(name = "user_profile_photo") String user_profile_photo,
+                                         @RequestParam(name = "user_id") int user_id) {
+        User user = new User();
+        user.setUser_id(user_id);
+        user.setUser_profile_photo(user_profile_photo);
+        int i = userService.photoUpload(user);
+        if (i == 1) {
+            return new ResponseEntity<>(user_profile_photo, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * 头像下载base64
+     *
+     * @param user_id
+     * @return
+     */
+    @RequestMapping("photoDownload")
+    public ResponseEntity<?> photoDownload(@RequestParam(name = "user_id") int user_id) {
+        String s = userService.photoDownload(user_id);
+        if (s != null) {
+            return new ResponseEntity<>(s, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("头像获取失败或者没有上传头像", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * 用户信息修改
+     *
+     * @param user_id
+     * @param user_name
+     * @param user_password
+     * @param user_email
+     * @param user_telephone_number
+     * @return
+     */
+    @RequestMapping("updateUserInfo")
+    public ResponseEntity<?> updateUserInfo(@RequestParam(name = "user_id") int user_id,
+                                            @RequestParam(name = "user_name") String user_name,
+                                            @RequestParam(name = "user_password") String user_password,
+                                            @RequestParam(name = "user_email") String user_email,
+                                            @RequestParam(name = "user_telephone_number") String user_telephone_number) {
+        User old_user = userService.queryUserById(user_id);
+        System.out.println("原来的USER：" + old_user);
+        User user = new User();
+        user.setUser_id(user_id);
+        user.setUser_name(user_name);
+        if (user_name.length() == 0) {
+            user.setUser_name(old_user.getUser_name());
+        }
+        user.setUser_password(user_password);
+        if (user_password.length() == 0) {
+            user.setUser_password(old_user.getUser_password());
+        }
+        user.setUser_email(user_email);
+        if (user_email.length() == 0) {
+            user.setUser_email(old_user.getUser_email());
+        }
+        user.setUser_telephone_number(user_telephone_number);
+        if (user_telephone_number.length() == 0) {
+            user.setUser_telephone_number(old_user.getUser_telephone_number());
+        }
+        System.out.println("现在的USER：" + user);
+        int i = userService.updateUserInfo(user);
+        if (i == 1) {
+            CommonResult cr = new CommonResult(200, user, "修改成功");
+            return new ResponseEntity<>(cr, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("修改失败", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * 根据ID查用户信息
+     *
+     * @param user_id
+     * @return
+     */
+    @RequestMapping("queryUserById")
+    public ResponseEntity<?> queryUserById(@RequestParam(name = "user_id") int user_id) {
+        User user = userService.queryUserById(user_id);
+        if (!StringUtils.isEmpty(user)) {
+            CommonResult cr = new CommonResult(200, user, "查找成功");
+            return new ResponseEntity<>(cr, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("查找失败", HttpStatus.BAD_REQUEST);
         }
     }
 }

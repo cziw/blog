@@ -3,6 +3,7 @@ package com.example.blog.mapper;
 import com.example.blog.domain.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -53,4 +54,40 @@ public interface UserMapper {
      */
     @Select("SELECT * FROM zj_users where user_email=#{user_email} and user_password=#{user_password}")
     User userLogin(User user);
+
+    /**
+     * 头像上传base64
+     *
+     * @param user
+     * @return
+     */
+    @Update("update zj_users set user_profile_photo = #{user_profile_photo} where user_id = #{user_id} ")
+    int photoUpload(User user);
+
+    /**
+     * 头像下载base64
+     *
+     * @param user_id
+     * @return
+     */
+    @Select("SELECT user_profile_photo FROM zj_users where user_id = #{user_id}")
+    String photoDownload(int user_id);
+
+    /**
+     * 用户信息修改
+     *
+     * @param user
+     * @return
+     */
+    @Update("update zj_users set user_name = '23' , user_password = '34',user_email='df',user_telephone_number='34' where user_id = '28'")
+    int updateUserInfo(User user);
+
+    /**
+     * 根据ID查用户信息
+     *
+     * @param user_id
+     * @return
+     */
+    @Select("SELECT * FROM zj_users where user_id = #{user_id}")
+    User queryUserById(int user_id);
 }

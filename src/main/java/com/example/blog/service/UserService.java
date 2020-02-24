@@ -48,4 +48,36 @@ public interface UserService {
      * @return
      */
     User userLogin(User user);
+
+    /**
+     * 头像上传
+     *
+     * @param user
+     * @return
+     */
+    int photoUpload(User user);
+
+    /**
+     * 头像下载base64
+     *
+     * @param user_id
+     * @return
+     */
+    String photoDownload(int user_id);
+
+    /**
+     * 用户信息修改
+     *
+     * @param user
+     * @return
+     */
+    int updateUserInfo(User user);
+
+    /**
+     * 根据ID查用户信息
+     *
+     * @param user_id
+     * @return
+     */
+    User queryUserById(int user_id);
 }

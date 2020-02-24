@@ -38,4 +38,24 @@ public class UserServiceImpl implements UserService {
     public User userLogin(User user) {
         return userMapper.userLogin(user);
     }
+
+    @Override
+    public int photoUpload(User user) {
+        return userMapper.photoUpload(user);
+    }
+
+    @Override
+    public String photoDownload(int user_id) {
+        return userMapper.photoDownload(user_id);
+    }
+
+    @Override
+    public int updateUserInfo(User user) {
+        return userMapper.updateUserInfo(user);
+    }
+
+    @Override
+    public User queryUserById(int user_id) {
+        return userMapper.queryUserById(user_id);
+    }
 }
