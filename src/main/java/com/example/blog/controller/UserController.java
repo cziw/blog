@@ -2,22 +2,37 @@ package com.example.blog.controller;
 
 import com.example.blog.domain.CommonResult;
 import com.example.blog.domain.User;
+import com.example.blog.service.impl.MailServiceImpl;
 import com.example.blog.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.Random;
 
 @RestController
 @RequestMapping("user")
 public class UserController {
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private MailServiceImpl mailService;
+
+    @RequestMapping(value = "/getCheckCode", method = RequestMethod.POST)
+    public int getCheckCode(@RequestParam(name = "user_email") String user_email){
+        String checkCode = String.valueOf(new Random().nextInt(899999) + 100000);
+        String message = "您的注册验证码为："+checkCode;
+        try {
+            mailService.sendMail(user_email, "注册验证码", message);
+            System.out.println("发送了邮件了");
+            return 1;
+        }catch (Exception e){
+            return 0;
+        }
+    }
 
     /**
      * 用户首页注册
