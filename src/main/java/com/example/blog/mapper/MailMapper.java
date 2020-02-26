@@ -1,21 +1,10 @@
-package com.example.blog.service;
+package com.example.blog.mapper;
 
 import com.example.blog.domain.Mail;
-import org.springframework.stereotype.Service;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Select;
 
-/**
- * 邮箱验证码接口
- */
-@Service
-public interface MailService {
-    /**
-     * 发送纯文本邮件
-     * @param to
-     * @param title
-     * @param content
-     */
-    void sendMail(String to, String title, String content);
-
+public interface MailMapper {
     /**
      * 邮箱验证码储存到数据库
      *
@@ -24,13 +13,14 @@ public interface MailService {
      * @param time
      * @return
      */
+    @Insert("INSERT into mailcheckcode (uid,mailCheckCode,time) VALUES(#{uid},#{mailCheckCode},#{time})")
     int getCheckCode(int uid, String mailCheckCode, String time);
 
     /**
      * 检查邮箱验证码
-     *
      * @param uid
      * @return
      */
+    @Select("Select * from mailcheckcode where uid = #{uid}")
     Mail checkMailCode(int uid);
 }
