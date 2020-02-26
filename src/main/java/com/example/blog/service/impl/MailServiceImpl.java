@@ -1,6 +1,9 @@
 package com.example.blog.service.impl;
 
+import com.example.blog.domain.Mail;
+import com.example.blog.mapper.MailMapper;
 import com.example.blog.service.MailService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,6 +16,8 @@ import javax.annotation.Resource;
  */
 @Service
 public class MailServiceImpl implements MailService {
+    @Autowired()
+    private MailMapper mailMapper;
     @Resource
     private JavaMailSender javaMailSender;
     @Value("${spring.mail.username}")
@@ -35,4 +40,28 @@ public class MailServiceImpl implements MailService {
         message.setText(text);
         javaMailSender.send(message);
     }
+
+    /**
+     * 邮箱验证码储存到数据库
+     *
+     * @param uid
+     * @param mailCheckCode
+     * @param time
+     * @return
+     */
+    public int getCheckCode(int uid, String mailCheckCode, String time) {
+        return mailMapper.getCheckCode(uid, mailCheckCode, time);
+    }
+
+    /**
+     * 检查邮箱验证码
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public Mail checkMailCode(int uid) {
+        return mailMapper.checkMailCode(uid);
+    }
+
 }

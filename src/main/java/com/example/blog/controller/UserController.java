@@ -1,6 +1,7 @@
 package com.example.blog.controller;
 
 import com.example.blog.domain.CommonResult;
+import com.example.blog.domain.Mail;
 import com.example.blog.domain.User;
 import com.example.blog.service.impl.MailServiceImpl;
 import com.example.blog.service.impl.UserServiceImpl;
@@ -21,15 +22,38 @@ public class UserController {
     @Autowired
     private MailServiceImpl mailService;
 
+    @RequestMapping(value = "/CheckMailCode", method = RequestMethod.GET)
+    public int CheckMailCode(@RequestParam(name = "code") String code,
+                             @RequestParam(name = "user_id") int user_id) {
+        // 获取数据库里的验证码对象
+        Mail mail = mailService.checkMailCode(user_id);
+        if (mail.getMailcheckCode().equals(code)) {
+            // 验证码相同 下一步确认时间
+            if (Long.parseLong(mail.getTime()) >= new Date().getTime()) {
+                // 时间确认通过
+            }
+        } else {
+            // 验证码不对
+        }
+        return 1;
+    }
+
+    /**
+     * 邮箱验证码
+     *
+     * @param user_email
+     * @return
+     */
     @RequestMapping(value = "/getCheckCode", method = RequestMethod.POST)
-    public int getCheckCode(@RequestParam(name = "user_email") String user_email){
+    public int getCheckCode(@RequestParam(name = "user_email") String user_email,
+                            @RequestParam(name = "user_id") int user_id) {
         String checkCode = String.valueOf(new Random().nextInt(899999) + 100000);
-        String message = "您的注册验证码为："+checkCode;
+        String message = "小伙子，你的注册验证码是：" + checkCode;
         try {
+            mailService.getCheckCode(user_id, checkCode, Long.toString(new Date().getTime() + 600000));
             mailService.sendMail(user_email, "注册验证码", message);
-            System.out.println("发送了邮件了");
             return 1;
-        }catch (Exception e){
+        } catch (Exception e) {
             return 0;
         }
     }
@@ -44,8 +68,19 @@ public class UserController {
                                           @RequestParam(name = "user_name") String user_name,
                                           @RequestParam(name = "user_password") String user_password,
                                           @RequestParam(name = "user_email") String user_email,
-                                          @RequestParam(name = "user_telephone_number") String user_telephone_number) {
+                                          @RequestParam(name = "user_telephone_number") String user_telephone_number,
+                                          @RequestParam(name = "uid") int uid) {
         User user = new User(user_ip, user_name, user_password, user_email, user_telephone_number, new Date());
+        // 获取数据库里的验证码对象 uid是游客id
+        Mail mail = mailService.checkMailCode(uid);
+        if (mail.getMailcheckCode().equals("code")) {
+            // 验证码相同 下一步确认时间
+            if (Long.parseLong(mail.getTime()) >= new Date().getTime()) {
+                // 时间确认通过
+            }
+        } else {
+            // 验证码不对
+        }
         if (userService.queryUserName(user_name).size() == 0 && userService.queryUserEmail(user_email).size() == 0 && userService.queryUserTel(user_telephone_number).size() == 0) {
             if (userService.userRegister(user) == 1) {
                 // 注册成功返回用户对象

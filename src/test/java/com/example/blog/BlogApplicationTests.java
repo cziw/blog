@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class BlogApplicationTests {
     @Autowired
     private UserService userSerivce;
+
     @Test
     void contextLoads() {
 
