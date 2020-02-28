@@ -2,7 +2,10 @@ package com.example.blog.mapper;
 
 import com.example.blog.domain.Mail;
 import org.apache.ibatis.annotations.Insert;
+<<<<<<< HEAD
 import org.apache.ibatis.annotations.Param;
+=======
+>>>>>>> origin/master
 import org.apache.ibatis.annotations.Select;
 
 public interface MailMapper {
@@ -15,7 +18,11 @@ public interface MailMapper {
      * @return
      */
     @Insert("INSERT into mailcheckcode (uid,mailCheckCode,time) VALUES(#{uid},#{mailCheckCode},#{time})")
+<<<<<<< HEAD
     int getCheckCode(@Param("uid") int uid, @Param("mailCheckCode") String mailCheckCode, @Param("time") String time);
+=======
+    int getCheckCode(int uid, String mailCheckCode, String time);
+>>>>>>> origin/master
 
     /**
      * 检查邮箱验证码
