@@ -23,7 +23,6 @@ public class UserController {
     @Autowired
     private MailServiceImpl mailService;
 
-<<<<<<< HEAD
     @RequestMapping(value = "/CheckMailCode", method = RequestMethod.GET)
     public int CheckMailCode(@RequestParam(name = "code") String code,
                              @RequestParam(name = "user_id") int user_id) {
@@ -41,8 +40,6 @@ public class UserController {
         return 1;
     }
 
-=======
->>>>>>> origin/master
     /**
      * 邮箱验证码
      *
@@ -53,11 +50,7 @@ public class UserController {
     public int getCheckCode(@RequestParam(name = "user_email") String user_email,
                             @RequestParam(name = "user_id") int user_id) {
         String checkCode = String.valueOf(new Random().nextInt(899999) + 100000);
-<<<<<<< HEAD
         String message = "小伙子，你的注册验证码是：" + checkCode;
-=======
-        String message = "小伙子，你的注册验证码是：" + checkCode + " 十分钟之后失效";
->>>>>>> origin/master
         try {
             mailService.getCheckCode(user_id, checkCode, Long.toString(new Date().getTime() + 600000));
             mailService.sendMail(user_email, "注册验证码", message);
@@ -78,7 +71,6 @@ public class UserController {
                                           @RequestParam(name = "user_password") String user_password,
                                           @RequestParam(name = "user_email") String user_email,
                                           @RequestParam(name = "user_telephone_number") String user_telephone_number,
-<<<<<<< HEAD
                                           @RequestParam(name = "uid") int uid) {
         User user = new User(user_ip, user_name, user_password, user_email, user_telephone_number, new Date());
         // 获取数据库里的验证码对象 uid是游客id
@@ -96,37 +88,12 @@ public class UserController {
                 // 注册成功返回用户对象
                 CommonResult cr = new CommonResult(200, user, "注册成功");
                 return new ResponseEntity<>(cr, HttpStatus.CREATED);
-=======
-                                          @RequestParam(name = "uid") int uid,
-                                          @RequestParam(name = "mailCode") String mailCode) {
-        User user = new User(user_ip, user_name, user_password, user_email, user_telephone_number, new Date());
-        // 获取数据库里的验证码对象 uid是游客id
-        Mail mail = mailService.checkMailCode(uid);
-        if (mailCode.equals(mail.getMailcheckCode())) {
-            // 验证码通过 下一步确认时间
-            if (Long.parseLong(mail.getTime()) >= new Date().getTime()) {
-                // 时间确认通过
-                // 注册
-                if (userService.queryUserName(user_name).size() == 0 && userService.queryUserEmail(user_email).size() == 0 && userService.queryUserTel(user_telephone_number).size() == 0) {
-                    if (userService.userRegister(user) == 1) {
-                        // 注册成功返回用户对象
-                        CommonResult cr = new CommonResult(200, user, "注册成功");
-                        return new ResponseEntity<>(cr, HttpStatus.CREATED);
-                    } else {
-                        return new ResponseEntity<>("注册失败", HttpStatus.NOT_IMPLEMENTED);
-                    }
-                } else {
-                    // 注册信息中某个字段与他人重复
-                    return new ResponseEntity<>("注册失败,请检查昵称、邮箱、手机号是否可用", HttpStatus.NOT_IMPLEMENTED);
-                }
->>>>>>> origin/master
             } else {
-                // 验证码过期
-                return new ResponseEntity<>("验证码过期", HttpStatus.NOT_IMPLEMENTED);
+                return new ResponseEntity<>("注册失败", HttpStatus.NOT_IMPLEMENTED);
             }
         } else {
-            // 验证码不对
-            return new ResponseEntity<>("验证码错误", HttpStatus.NOT_IMPLEMENTED);
+            // 注册信息中某个字段与他人重复
+            return new ResponseEntity<>("注册失败,请检查昵称、邮箱、手机号是否可用", HttpStatus.NOT_IMPLEMENTED);
         }
     }
 
