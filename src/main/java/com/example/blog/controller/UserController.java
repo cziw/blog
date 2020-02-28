@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.util.Date;
 import java.util.Random;
 
@@ -27,6 +28,7 @@ public class UserController {
                              @RequestParam(name = "user_id") int user_id) {
         // 获取数据库里的验证码对象
         Mail mail = mailService.checkMailCode(user_id);
+
         if (mail.getMailcheckCode().equals(code)) {
             // 验证码相同 下一步确认时间
             if (Long.parseLong(mail.getTime()) >= new Date().getTime()) {
@@ -106,7 +108,7 @@ public class UserController {
         if (userService.queryUserName(user_name).size() == 0) {
             return new ResponseEntity<>("昵称可用", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("昵称已被使用", HttpStatus.FOUND);
+            return new ResponseEntity<>("昵称已被使用", HttpStatus.CONFLICT);
         }
     }
 
@@ -121,7 +123,7 @@ public class UserController {
         if (userService.queryUserEmail(user_email).size() == 0) {
             return new ResponseEntity<>("邮箱可用", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("邮箱已被使用", HttpStatus.FOUND);
+            return new ResponseEntity<>("邮箱已被使用", HttpStatus.CONFLICT);
         }
     }
 
@@ -136,7 +138,7 @@ public class UserController {
         if (userService.queryUserTel(user_telephone_number).size() == 0) {
             return new ResponseEntity<>("手机号可用", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("手机号已被使用", HttpStatus.FOUND);
+            return new ResponseEntity<>("手机号已被使用", HttpStatus.CONFLICT);
         }
     }
 
