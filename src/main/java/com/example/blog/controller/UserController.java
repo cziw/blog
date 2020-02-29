@@ -104,11 +104,11 @@ public class UserController {
      * @return
      */
     @RequestMapping("queryUserName")
-    public ResponseEntity<?> queryUserName(@RequestParam(name = "user_name") String user_name) {
+    public CommonResult queryUserName(@RequestParam(name = "user_name") String user_name) {
         if (userService.queryUserName(user_name).size() == 0) {
-            return new ResponseEntity<>("昵称可用", HttpStatus.OK);
+            return new CommonResult(1, null,"昵称可用");
         } else {
-            return new ResponseEntity<>("昵称已被使用", HttpStatus.CONFLICT);
+            return new CommonResult(0,null,"昵称已被使用" );
         }
     }
 
@@ -119,11 +119,11 @@ public class UserController {
      * @return
      */
     @RequestMapping("queryUserEmail")
-    public ResponseEntity<?> queryUserEmail(@RequestParam(name = "user_email") String user_email) {
+    public CommonResult queryUserEmail(@RequestParam(name = "user_email") String user_email) {
         if (userService.queryUserEmail(user_email).size() == 0) {
-            return new ResponseEntity<>("邮箱可用", HttpStatus.OK);
+            return new CommonResult(1, null,"邮箱可用");
         } else {
-            return new ResponseEntity<>("邮箱已被使用", HttpStatus.CONFLICT);
+            return new CommonResult(0, null,"邮箱已被使用");
         }
     }
 
@@ -134,11 +134,11 @@ public class UserController {
      * @return
      */
     @RequestMapping("queryUserTel")
-    public ResponseEntity<?> queryUserTel(@RequestParam(name = "user_telephone_number") String user_telephone_number) {
+    public CommonResult queryUserTel(@RequestParam(name = "user_telephone_number") String user_telephone_number) {
         if (userService.queryUserTel(user_telephone_number).size() == 0) {
-            return new ResponseEntity<>("手机号可用", HttpStatus.OK);
+            return new CommonResult(1,null,"手机号可用");
         } else {
-            return new ResponseEntity<>("手机号已被使用", HttpStatus.CONFLICT);
+            return new CommonResult(0,null,"手机号已被使用");
         }
     }
 
