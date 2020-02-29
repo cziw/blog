@@ -25,7 +25,6 @@ public class UserController {
     @Autowired
     private MailServiceImpl mailService;
 
-
     /**
      * 邮箱验证码
      *
