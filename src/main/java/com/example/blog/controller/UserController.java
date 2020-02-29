@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,7 +30,7 @@ public class UserController {
      * @param user_email
      * @return
      */
-    @RequestMapping(value = "/getCheckCode", method = RequestMethod.POST)
+    @RequestMapping("getCheckCode")
     public int getCheckCode(@RequestParam(name = "user_email") String user_email) {
         String checkCode = String.valueOf(new Random().nextInt(899999) + 100000);
         String message = "小伙子，你的注册验证码是：" + checkCode;
