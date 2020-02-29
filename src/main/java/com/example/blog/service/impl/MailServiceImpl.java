@@ -44,24 +44,22 @@ public class MailServiceImpl implements MailService {
     /**
      * 邮箱验证码储存到数据库
      *
-     * @param uid
-     * @param mailCheckCode
-     * @param time
+     * @param mail
      * @return
      */
-    public int getCheckCode(int uid, String mailCheckCode, String time) {
-        return mailMapper.getCheckCode(uid, mailCheckCode, time);
+    public int getCheckCode(Mail mail) {
+        return mailMapper.getCheckCode(mail);
     }
 
     /**
      * 检查邮箱验证码
      *
-     * @param uid
+     * @param email
      * @return
      */
     @Override
-    public Mail checkMailCode(int uid) {
-        return mailMapper.checkMailCode(uid);
+    public Mail checkMailCode(String email) {
+        return mailMapper.checkMailCode(email);
     }
 
 }

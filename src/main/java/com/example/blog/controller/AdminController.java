@@ -20,10 +20,11 @@ public class AdminController {
 
     /**
      * 查询所有用户的信息
+     *
      * @return
      */
     @RequestMapping("queryAllUser")
-    public List<User> queryAllUser(){
+    public List<User> queryAllUser() {
         return adminService.queryAllUser();
     }
 }

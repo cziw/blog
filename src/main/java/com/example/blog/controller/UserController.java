@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
 import java.util.Date;
 import java.util.Random;
 
@@ -23,22 +25,6 @@ public class UserController {
     @Autowired
     private MailServiceImpl mailService;
 
-    @RequestMapping(value = "/CheckMailCode", method = RequestMethod.GET)
-    public int CheckMailCode(@RequestParam(name = "code") String code,
-                             @RequestParam(name = "user_id") int user_id) {
-        // 获取数据库里的验证码对象
-        Mail mail = mailService.checkMailCode(user_id);
-
-        if (mail.getMailcheckCode().equals(code)) {
-            // 验证码相同 下一步确认时间
-            if (Long.parseLong(mail.getTime()) >= new Date().getTime()) {
-                // 时间确认通过
-            }
-        } else {
-            // 验证码不对
-        }
-        return 1;
-    }
 
     /**
      * 邮箱验证码
@@ -47,15 +33,18 @@ public class UserController {
      * @return
      */
     @RequestMapping(value = "/getCheckCode", method = RequestMethod.POST)
-    public int getCheckCode(@RequestParam(name = "user_email") String user_email,
-                            @RequestParam(name = "user_id") int user_id) {
+    public int getCheckCode(@RequestParam(name = "user_email") String user_email) {
         String checkCode = String.valueOf(new Random().nextInt(899999) + 100000);
         String message = "小伙子，你的注册验证码是：" + checkCode;
         try {
-            mailService.getCheckCode(user_id, checkCode, Long.toString(new Date().getTime() + 600000));
+            Mail mail = new Mail(user_email, checkCode, Long.toString(new Date().getTime() + 600000));
+            System.out.println(mail);
+            // 验证码储存到数据库
+            mailService.getCheckCode(mail);
             mailService.sendMail(user_email, "注册验证码", message);
             return 1;
         } catch (Exception e) {
+            System.out.println(e);
             return 0;
         }
     }
@@ -71,29 +60,33 @@ public class UserController {
                                           @RequestParam(name = "user_password") String user_password,
                                           @RequestParam(name = "user_email") String user_email,
                                           @RequestParam(name = "user_telephone_number") String user_telephone_number,
-                                          @RequestParam(name = "uid") int uid) {
+                                          @RequestParam(name = "code") String code) {
         User user = new User(user_ip, user_name, user_password, user_email, user_telephone_number, new Date());
-        // 获取数据库里的验证码对象 uid是游客id
-        Mail mail = mailService.checkMailCode(uid);
-        if (mail.getMailcheckCode().equals("code")) {
+        // 获取数据库里的验证码对象
+        Mail mail = mailService.checkMailCode(user_email);
+        if (code.equals(mail.getMailcheckCode())) {
             // 验证码相同 下一步确认时间
             if (Long.parseLong(mail.getTime()) >= new Date().getTime()) {
                 // 时间确认通过
-            }
-        } else {
-            // 验证码不对
-        }
-        if (userService.queryUserName(user_name).size() == 0 && userService.queryUserEmail(user_email).size() == 0 && userService.queryUserTel(user_telephone_number).size() == 0) {
-            if (userService.userRegister(user) == 1) {
-                // 注册成功返回用户对象
-                CommonResult cr = new CommonResult(200, user, "注册成功");
-                return new ResponseEntity<>(cr, HttpStatus.CREATED);
+                if (userService.queryUserName(user_name).size() == 0 && userService.queryUserEmail(user_email).size() == 0 && userService.queryUserTel(user_telephone_number).size() == 0) {
+                    if (userService.userRegister(user) == 1) {
+                        // 注册成功返回用户对象
+                        CommonResult cr = new CommonResult(200, user, "注册成功");
+                        return new ResponseEntity<>(cr, HttpStatus.CREATED);
+                    } else {
+                        return new ResponseEntity<>("注册失败", HttpStatus.NOT_IMPLEMENTED);
+                    }
+                } else {
+                    // 注册信息中某个字段与他人重复
+                    return new ResponseEntity<>("注册失败,请检查昵称、邮箱、手机号是否可用", HttpStatus.NOT_IMPLEMENTED);
+                }
             } else {
-                return new ResponseEntity<>("注册失败", HttpStatus.NOT_IMPLEMENTED);
+                // 邮箱验证码过期
+                return new ResponseEntity<>("邮箱验证码过期", HttpStatus.NOT_IMPLEMENTED);
             }
         } else {
-            // 注册信息中某个字段与他人重复
-            return new ResponseEntity<>("注册失败,请检查昵称、邮箱、手机号是否可用", HttpStatus.NOT_IMPLEMENTED);
+            // 邮箱验证码不对
+            return new ResponseEntity<>("邮箱验证码不对", HttpStatus.NOT_IMPLEMENTED);
         }
     }
 
@@ -106,9 +99,9 @@ public class UserController {
     @RequestMapping("queryUserName")
     public CommonResult queryUserName(@RequestParam(name = "user_name") String user_name) {
         if (userService.queryUserName(user_name).size() == 0) {
-            return new CommonResult(1, null,"昵称可用");
+            return new CommonResult(1, null, "昵称可用");
         } else {
-            return new CommonResult(0,null,"昵称已被使用" );
+            return new CommonResult(0, null, "昵称已被使用");
         }
     }
 
@@ -121,9 +114,9 @@ public class UserController {
     @RequestMapping("queryUserEmail")
     public CommonResult queryUserEmail(@RequestParam(name = "user_email") String user_email) {
         if (userService.queryUserEmail(user_email).size() == 0) {
-            return new CommonResult(1, null,"邮箱可用");
+            return new CommonResult(1, null, "邮箱可用");
         } else {
-            return new CommonResult(0, null,"邮箱已被使用");
+            return new CommonResult(0, null, "邮箱已被使用");
         }
     }
 
@@ -136,9 +129,9 @@ public class UserController {
     @RequestMapping("queryUserTel")
     public CommonResult queryUserTel(@RequestParam(name = "user_telephone_number") String user_telephone_number) {
         if (userService.queryUserTel(user_telephone_number).size() == 0) {
-            return new CommonResult(1,null,"手机号可用");
+            return new CommonResult(1, null, "手机号可用");
         } else {
-            return new CommonResult(0,null,"手机号已被使用");
+            return new CommonResult(0, null, "手机号已被使用");
         }
     }
 

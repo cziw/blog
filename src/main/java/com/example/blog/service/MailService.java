@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 public interface MailService {
     /**
      * 发送纯文本邮件
+     *
      * @param to
      * @param title
      * @param content
@@ -19,18 +20,16 @@ public interface MailService {
     /**
      * 邮箱验证码储存到数据库
      *
-     * @param uid
-     * @param mailCheckCode
-     * @param time
+     * @param mail
      * @return
      */
-    int getCheckCode(int uid, String mailCheckCode, String time);
+    int getCheckCode(Mail mail);
 
     /**
      * 检查邮箱验证码
      *
-     * @param uid
+     * @param email
      * @return
      */
-    Mail checkMailCode(int uid);
+    Mail checkMailCode(String email);
 }
