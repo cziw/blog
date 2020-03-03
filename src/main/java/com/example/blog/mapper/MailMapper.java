@@ -1,6 +1,7 @@
 package com.example.blog.mapper;
 
 import com.example.blog.domain.Mail;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
@@ -22,4 +23,13 @@ public interface MailMapper {
      */
     @Select("Select * from zj_mail_check where email = #{email}")
     Mail checkMailCode(String email);
+
+    /**
+     * 删除邮箱验证码
+     *
+     * @param email
+     * @return
+     */
+    @Delete("DELETE from zj_mail_check where email = #{email}")
+    int delMailCodeByMail(String email);
 }

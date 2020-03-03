@@ -32,4 +32,12 @@ public interface MailService {
      * @return
      */
     Mail checkMailCode(String email);
+
+    /**
+     * 删除邮箱验证码
+     *
+     * @param email
+     * @return
+     */
+    int delMailCodeByMail(String email);
 }

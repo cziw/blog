@@ -62,4 +62,15 @@ public class MailServiceImpl implements MailService {
         return mailMapper.checkMailCode(email);
     }
 
+    /**
+     * 删除邮箱验证码
+     *
+     * @param email
+     * @return
+     */
+    @Override
+    public int delMailCodeByMail(String email) {
+        return mailMapper.delMailCodeByMail(email);
+    }
+
 }

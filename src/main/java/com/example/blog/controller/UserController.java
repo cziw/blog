@@ -31,19 +31,21 @@ public class UserController {
      * @return
      */
     @RequestMapping("getCheckCode")
-    public int getCheckCode(@RequestParam(name = "user_email") String user_email) {
+    public CommonResult getCheckCode(@RequestParam(name = "user_email") String user_email) {
         String checkCode = String.valueOf(new Random().nextInt(899999) + 100000);
         String message = "小伙子，你的注册验证码是：" + checkCode;
         try {
             Mail mail = new Mail(user_email, checkCode, Long.toString(new Date().getTime() + 600000));
             System.out.println(mail);
+            // 先删除数据库里的验证码
+            mailService.delMailCodeByMail(user_email);
             // 验证码储存到数据库
             mailService.getCheckCode(mail);
-            mailService.sendMail(user_email, "注册验证码", message);
-            return 1;
+            mailService.sendMail(user_email, "欢迎注册CODW编程世界", message);
+            return new CommonResult(200, "发送成功");
         } catch (Exception e) {
             System.out.println(e);
-            return 0;
+            return new CommonResult(400, "发送失败");
         }
     }
 
@@ -53,12 +55,12 @@ public class UserController {
      * @return
      */
     @RequestMapping("register")
-    public ResponseEntity<?> userRegister(@RequestParam(name = "user_ip") String user_ip,
-                                          @RequestParam(name = "user_name") String user_name,
-                                          @RequestParam(name = "user_password") String user_password,
-                                          @RequestParam(name = "user_email") String user_email,
-                                          @RequestParam(name = "user_telephone_number") String user_telephone_number,
-                                          @RequestParam(name = "code") String code) {
+    public CommonResult userRegister(@RequestParam(name = "user_ip") String user_ip,
+                                     @RequestParam(name = "user_name") String user_name,
+                                     @RequestParam(name = "user_password") String user_password,
+                                     @RequestParam(name = "user_email") String user_email,
+                                     @RequestParam(name = "user_telephone_number") String user_telephone_number,
+                                     @RequestParam(name = "code") String code) {
         User user = new User(user_ip, user_name, user_password, user_email, user_telephone_number, new Date());
         // 获取数据库里的验证码对象
         Mail mail = mailService.checkMailCode(user_email);
@@ -69,22 +71,21 @@ public class UserController {
                 if (userService.queryUserName(user_name).size() == 0 && userService.queryUserEmail(user_email).size() == 0 && userService.queryUserTel(user_telephone_number).size() == 0) {
                     if (userService.userRegister(user) == 1) {
                         // 注册成功返回用户对象
-                        CommonResult cr = new CommonResult(200, user, "注册成功");
-                        return new ResponseEntity<>(cr, HttpStatus.CREATED);
+                        return new CommonResult(200, user, "注册成功");
                     } else {
-                        return new ResponseEntity<>("注册失败", HttpStatus.NOT_IMPLEMENTED);
+                        return new CommonResult(400, "注册失败");
                     }
                 } else {
                     // 注册信息中某个字段与他人重复
-                    return new ResponseEntity<>("注册失败,请检查昵称、邮箱、手机号是否可用", HttpStatus.NOT_IMPLEMENTED);
+                    return new CommonResult(400, "请检查昵称");
                 }
             } else {
                 // 邮箱验证码过期
-                return new ResponseEntity<>("邮箱验证码过期", HttpStatus.NOT_IMPLEMENTED);
+                return new CommonResult(400, "邮箱验证码过期");
             }
         } else {
             // 邮箱验证码不对
-            return new ResponseEntity<>("邮箱验证码不对", HttpStatus.NOT_IMPLEMENTED);
+            return new CommonResult(400, "邮箱验证码不对");
         }
     }
 
@@ -97,9 +98,9 @@ public class UserController {
     @RequestMapping("queryUserName")
     public CommonResult queryUserName(@RequestParam(name = "user_name") String user_name) {
         if (userService.queryUserName(user_name).size() == 0) {
-            return new CommonResult(1, null, "昵称可用");
+            return new CommonResult(200, "昵称可用");
         } else {
-            return new CommonResult(0, null, "昵称已被使用");
+            return new CommonResult(400, "昵称已被使用");
         }
     }
 
@@ -112,9 +113,9 @@ public class UserController {
     @RequestMapping("queryUserEmail")
     public CommonResult queryUserEmail(@RequestParam(name = "user_email") String user_email) {
         if (userService.queryUserEmail(user_email).size() == 0) {
-            return new CommonResult(1, null, "邮箱可用");
+            return new CommonResult(200, "邮箱可用");
         } else {
-            return new CommonResult(0, null, "邮箱已被使用");
+            return new CommonResult(400, "邮箱已被使用");
         }
     }
 
@@ -127,9 +128,9 @@ public class UserController {
     @RequestMapping("queryUserTel")
     public CommonResult queryUserTel(@RequestParam(name = "user_telephone_number") String user_telephone_number) {
         if (userService.queryUserTel(user_telephone_number).size() == 0) {
-            return new CommonResult(1, null, "手机号可用");
+            return new CommonResult(200, "手机号可用");
         } else {
-            return new CommonResult(0, null, "手机号已被使用");
+            return new CommonResult(400, "手机号已被使用");
         }
     }
 
@@ -141,15 +142,14 @@ public class UserController {
      * @return
      */
     @RequestMapping("userLogin")
-    public ResponseEntity<?> userLogin(@RequestParam(name = "user_email") String user_email,
-                                       @RequestParam(name = "user_password") String user_password) {
+    public CommonResult userLogin(@RequestParam(name = "user_email") String user_email,
+                                  @RequestParam(name = "user_password") String user_password) {
         User user = userService.userLogin(new User(user_email, user_password));
         if (!StringUtils.isEmpty(user)) {
             // 登录成功返回用户对象
-            CommonResult cr = new CommonResult(200, user, "登录成功");
-            return new ResponseEntity<>(cr, HttpStatus.OK);
+            return new CommonResult(200, user, "登录成功");
         } else {
-            return new ResponseEntity<>("账号密码错误", HttpStatus.BAD_REQUEST);
+            return new CommonResult(400, "账号密码错误");
         }
     }
 
@@ -160,16 +160,16 @@ public class UserController {
      * @return
      */
     @RequestMapping("photoUpload")
-    public ResponseEntity<?> photoUpload(@RequestParam(name = "user_profile_photo") String user_profile_photo,
-                                         @RequestParam(name = "user_id") int user_id) {
+    public CommonResult photoUpload(@RequestParam(name = "user_profile_photo") String user_profile_photo,
+                                    @RequestParam(name = "user_id") int user_id) {
         User user = new User();
         user.setUser_id(user_id);
         user.setUser_profile_photo(user_profile_photo);
         int i = userService.photoUpload(user);
         if (i == 1) {
-            return new ResponseEntity<>(user_profile_photo, HttpStatus.OK);
+            return new CommonResult(200, user_profile_photo, "上传成功");
         } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new CommonResult(400, "上传成功");
         }
     }
 
@@ -180,12 +180,12 @@ public class UserController {
      * @return
      */
     @RequestMapping("photoDownload")
-    public ResponseEntity<?> photoDownload(@RequestParam(name = "user_id") int user_id) {
+    public CommonResult photoDownload(@RequestParam(name = "user_id") int user_id) {
         String s = userService.photoDownload(user_id);
         if (s != null) {
-            return new ResponseEntity<>(s, HttpStatus.OK);
+            return new CommonResult(200, s, "下载成功");
         } else {
-            return new ResponseEntity<>("头像获取失败或者没有上传头像", HttpStatus.BAD_REQUEST);
+            return new CommonResult(400, "下载失败");
         }
     }
 
@@ -242,13 +242,12 @@ public class UserController {
      * @return
      */
     @RequestMapping("queryUserById")
-    public ResponseEntity<?> queryUserById(@RequestParam(name = "user_id") int user_id) {
+    public CommonResult queryUserById(@RequestParam(name = "user_id") int user_id) {
         User user = userService.queryUserById(user_id);
         if (!StringUtils.isEmpty(user)) {
-            CommonResult cr = new CommonResult(200, user, "查找成功");
-            return new ResponseEntity<>(cr, HttpStatus.OK);
+            return new CommonResult(200, user, "查找成功");
         } else {
-            return new ResponseEntity<>("查找失败", HttpStatus.BAD_REQUEST);
+            return new CommonResult(400, "查找失败");
         }
     }
 }

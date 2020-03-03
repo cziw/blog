@@ -24,6 +24,11 @@ public class CommonResult implements Serializable {
         this.object = object;
     }
 
+    public CommonResult(int status, String msg) {
+        this.status = status;
+        this.msg = msg;
+    }
+
     public CommonResult(int status, Object object, String msg) {
         this.status = status;
         this.object = object;
