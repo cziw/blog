@@ -51,6 +51,10 @@ public class UserController {
                     return new CommonResult(400, "十分钟之内无法再次发送，请检查邮箱邮件");
                 }
             }
+            if (!StringUtils.isEmpty(userService.queryUserEmail("user_email"))) {
+                // 用户已经存在
+                return new CommonResult(400, "你已经注册过了，请登录");
+            }
             // 先删除数据库里的验证码
             mailService.delMailCodeByMail(user_email);
             // 验证码储存到数据库
