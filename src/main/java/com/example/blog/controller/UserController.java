@@ -45,7 +45,7 @@ public class UserController {
             Mail mail = new Mail(user_email, checkCode, Long.toString(new Date().getTime() + 600000));
             // 检查10分钟之内是否已经发送
             Mail mail2 = mailService.checkMailCode(user_email);
-            if (mail2.getTime().length() != 0) {
+            if (!StringUtils.isEmpty(mail2)) {
                 // 已经有验证码在数据库里 检查时间是否大于十分钟
                 if (Long.parseLong(mail2.getTime()) >= new Date().getTime()) {
                     return new CommonResult(400, "十分钟之内无法再次发送，请检查邮箱邮件");
@@ -161,7 +161,7 @@ public class UserController {
         User user = userService.userLogin(new User(user_email, user_password));
         if (!StringUtils.isEmpty(user)) {
             String token = tokenService.getToken(user);
-            JSONObject jsonObject=new JSONObject();
+            JSONObject jsonObject = new JSONObject();
             jsonObject.put("token", token);
             jsonObject.put("user", user);
             // 登录成功返回用户对象
@@ -194,6 +194,7 @@ public class UserController {
 
     /**
      * 头像下载base64
+     *
      * @param httpServletRequest
      * @return
      */
@@ -257,6 +258,7 @@ public class UserController {
 
     /**
      * 根据token查用户信息
+     *
      * @param httpServletRequest
      * @return
      */
