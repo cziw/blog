@@ -36,7 +36,14 @@ public class UserController {
         String message = "小伙子，你的注册验证码是：" + checkCode;
         try {
             Mail mail = new Mail(user_email, checkCode, Long.toString(new Date().getTime() + 600000));
-            System.out.println(mail);
+            // 检查10分钟之内是否已经发送
+            Mail mail2 = mailService.checkMailCode(user_email);
+            if (mail2.getTime().length() != 0) {
+               // 已经有验证码在数据库里 检查时间是否大于十分钟
+                if (Long.parseLong(mail2.getTime()) >= new Date().getTime()) {
+                    return new CommonResult(400, "十分钟之内无法再次发送，请检查邮箱邮件");
+                }
+            }
             // 先删除数据库里的验证码
             mailService.delMailCodeByMail(user_email);
             // 验证码储存到数据库
