@@ -30,7 +30,7 @@ public interface UserService {
      * @param user_email
      * @return
      */
-    List<User> queryUserEmail(String user_email);
+    User queryUserEmail(String user_email);
 
 
     /**

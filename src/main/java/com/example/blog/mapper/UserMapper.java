@@ -35,7 +35,7 @@ public interface UserMapper {
      * @return
      */
     @Select("SELECT * FROM zj_users where user_email=#{user_email}")
-    List<User> queryUserEmail(String user_email);
+    User queryUserEmail(String user_email);
 
     /**
      * 查询用户手机号是否重复

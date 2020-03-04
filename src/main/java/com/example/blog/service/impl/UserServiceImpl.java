@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> queryUserEmail(String user_email) {
+    public User queryUserEmail(String user_email) {
         return userMapper.queryUserEmail(user_email);
     }
 

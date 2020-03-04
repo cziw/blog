@@ -51,7 +51,7 @@ public class UserController {
                     return new CommonResult(400, "十分钟之内无法再次发送，请检查邮箱邮件");
                 }
             }
-            if (!StringUtils.isEmpty(userService.queryUserEmail("user_email"))) {
+            if (!StringUtils.isEmpty(userService.queryUserEmail(user_email))) {
                 // 用户已经存在
                 return new CommonResult(400, "你已经注册过了，请登录");
             }
@@ -86,7 +86,7 @@ public class UserController {
             // 验证码相同 下一步确认时间
             if (Long.parseLong(mail.getTime()) >= new Date().getTime()) {
                 // 时间确认通过
-                if (userService.queryUserName(user_name).size() == 0 && userService.queryUserEmail(user_email).size() == 0 && userService.queryUserTel(user_telephone_number).size() == 0) {
+                if (userService.queryUserName(user_name).size() == 0 && StringUtils.isEmpty(userService.queryUserEmail("user_email")) && userService.queryUserTel(user_telephone_number).size() == 0) {
                     if (userService.userRegister(user) == 1) {
                         // 注册成功返回用户对象
                         return new CommonResult(200, user, "注册成功");
@@ -130,7 +130,7 @@ public class UserController {
      */
     @RequestMapping("queryUserEmail")
     public CommonResult queryUserEmail(@RequestParam(name = "user_email") String user_email) {
-        if (userService.queryUserEmail(user_email).size() == 0) {
+        if (StringUtils.isEmpty(userService.queryUserEmail("user_email"))) {
             return new CommonResult(200, "邮箱可用");
         } else {
             return new CommonResult(400, "邮箱已被使用");
