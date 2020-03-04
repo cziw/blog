@@ -1,6 +1,7 @@
 package com.example.blog.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.auth0.jwt.JWT;
 import com.example.blog.config.UserLoginToken;
 import com.example.blog.domain.CommonResult;
 import com.example.blog.domain.Mail;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Random;
 
@@ -178,9 +180,9 @@ public class UserController {
     @UserLoginToken
     @RequestMapping("photoUpload")
     public CommonResult photoUpload(@RequestParam(name = "user_profile_photo") String user_profile_photo,
-                                    @RequestParam(name = "user_id") int user_id) {
+                                    HttpServletRequest httpServletRequest) {
         User user = new User();
-        user.setUser_id(user_id);
+        user.setUser_id(Integer.parseInt(JWT.decode(httpServletRequest.getHeader("token")).getAudience().get(0)));
         user.setUser_profile_photo(user_profile_photo);
         int i = userService.photoUpload(user);
         if (i == 1) {
@@ -192,14 +194,13 @@ public class UserController {
 
     /**
      * 头像下载base64
-     *
-     * @param user_id
+     * @param httpServletRequest
      * @return
      */
     @UserLoginToken
     @RequestMapping("photoDownload")
-    public CommonResult photoDownload(@RequestParam(name = "user_id") int user_id) {
-        String s = userService.photoDownload(user_id);
+    public CommonResult photoDownload(HttpServletRequest httpServletRequest) {
+        String s = userService.photoDownload(Integer.parseInt(JWT.decode(httpServletRequest.getHeader("token")).getAudience().get(0)));
         if (s != null) {
             return new CommonResult(200, s, "下载成功");
         } else {
@@ -255,15 +256,14 @@ public class UserController {
     }
 
     /**
-     * 根据ID查用户信息
-     *
-     * @param user_id
+     * 根据token查用户信息
+     * @param httpServletRequest
      * @return
      */
     @UserLoginToken
     @RequestMapping("queryUserById")
-    public CommonResult queryUserById(@RequestParam(name = "user_id") int user_id) {
-        User user = userService.queryUserById(user_id);
+    public CommonResult queryUserById(HttpServletRequest httpServletRequest) {
+        User user = userService.queryUserById(Integer.parseInt(JWT.decode(httpServletRequest.getHeader("token")).getAudience().get(0)));
         if (!StringUtils.isEmpty(user)) {
             return new CommonResult(200, user, "查找成功");
         } else {
