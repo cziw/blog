@@ -1,5 +1,6 @@
 package com.example.blog.controller;
 
+import com.example.blog.config.UserLoginToken;
 import com.example.blog.domain.User;
 import com.example.blog.service.impl.AdminServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class AdminController {
      *
      * @return
      */
+    @UserLoginToken
     @RequestMapping("queryAllUser")
     public List<User> queryAllUser() {
         return adminService.queryAllUser();

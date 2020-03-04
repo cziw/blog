@@ -1,5 +1,6 @@
 package com.example.blog.controller;
 
+import com.example.blog.config.UserLoginToken;
 import com.example.blog.domain.CommonResult;
 import com.example.blog.domain.User;
 import com.example.blog.service.impl.UserInfoServiceImpl;
@@ -22,6 +23,7 @@ public class UserInfoController {
      *
      * @return
      */
+    @UserLoginToken
     @RequestMapping("userNameUpdate")
     public CommonResult userNameUpdate(@RequestParam(name = "user_id") int user_id,
                                        @RequestParam(name = "user_new_name") String user_new_name) {
@@ -43,6 +45,7 @@ public class UserInfoController {
      *
      * @return
      */
+    @UserLoginToken
     @RequestMapping("userPasswordUpdate")
     public CommonResult userPasswordUpdate(@RequestParam(name = "user_id") int user_id,
                                            @RequestParam(name = "user_old_password") String user_old_password,

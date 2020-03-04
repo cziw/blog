@@ -1,9 +1,12 @@
 package com.example.blog.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.example.blog.config.UserLoginToken;
 import com.example.blog.domain.CommonResult;
 import com.example.blog.domain.Mail;
 import com.example.blog.domain.User;
 import com.example.blog.service.impl.MailServiceImpl;
+import com.example.blog.service.impl.TokenServiceImpl;
 import com.example.blog.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +26,8 @@ public class UserController {
     private UserServiceImpl userService;
     @Autowired
     private MailServiceImpl mailService;
+    @Autowired
+    private TokenServiceImpl tokenService;
 
     /**
      * 邮箱验证码
@@ -39,7 +44,7 @@ public class UserController {
             // 检查10分钟之内是否已经发送
             Mail mail2 = mailService.checkMailCode(user_email);
             if (mail2.getTime().length() != 0) {
-               // 已经有验证码在数据库里 检查时间是否大于十分钟
+                // 已经有验证码在数据库里 检查时间是否大于十分钟
                 if (Long.parseLong(mail2.getTime()) >= new Date().getTime()) {
                     return new CommonResult(400, "十分钟之内无法再次发送，请检查邮箱邮件");
                 }
@@ -153,8 +158,12 @@ public class UserController {
                                   @RequestParam(name = "user_password") String user_password) {
         User user = userService.userLogin(new User(user_email, user_password));
         if (!StringUtils.isEmpty(user)) {
+            String token = tokenService.getToken(user);
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("token", token);
+            jsonObject.put("user", user);
             // 登录成功返回用户对象
-            return new CommonResult(200, user, "登录成功");
+            return new CommonResult(200, jsonObject, "登录成功");
         } else {
             return new CommonResult(400, "账号密码错误");
         }
@@ -166,6 +175,7 @@ public class UserController {
      * @param user_profile_photo
      * @return
      */
+    @UserLoginToken
     @RequestMapping("photoUpload")
     public CommonResult photoUpload(@RequestParam(name = "user_profile_photo") String user_profile_photo,
                                     @RequestParam(name = "user_id") int user_id) {
@@ -186,6 +196,7 @@ public class UserController {
      * @param user_id
      * @return
      */
+    @UserLoginToken
     @RequestMapping("photoDownload")
     public CommonResult photoDownload(@RequestParam(name = "user_id") int user_id) {
         String s = userService.photoDownload(user_id);
@@ -206,6 +217,7 @@ public class UserController {
      * @param user_telephone_number
      * @return
      */
+    @UserLoginToken
     @RequestMapping("updateUserInfo")
     public ResponseEntity<?> updateUserInfo(@RequestParam(name = "user_id") int user_id,
                                             @RequestParam(name = "user_name") String user_name,
@@ -248,6 +260,7 @@ public class UserController {
      * @param user_id
      * @return
      */
+    @UserLoginToken
     @RequestMapping("queryUserById")
     public CommonResult queryUserById(@RequestParam(name = "user_id") int user_id) {
         User user = userService.queryUserById(user_id);
